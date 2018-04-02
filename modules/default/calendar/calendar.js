@@ -19,6 +19,7 @@ Module.register("calendar", {
 		defaultRepeatingCountTitle: "",
 		maxTitleLength: 25,
 		wrapEvents: false, // wrap events to multiple lines breaking at maxTitleLength
+		wrapLines: true, // wrap events to multiple lines breaking at line breaks
 		fetchInterval: 5 * 60 * 1000, // Update every 5 minutes.
 		animationSpeed: 2000,
 		fade: true,
@@ -436,7 +437,7 @@ Module.register("calendar", {
 	 * @param {boolean} wrapEvents Wrap the text after the line has reached maxLength
 	 * @returns {string} The shortened string
 	 */
-	shorten: function (string, maxLength, wrapEvents) {
+	shorten: function (string, maxLength, wrapEvents, wrapLines) {
 		if (typeof string !== "string") {
 			return "";
 		}
@@ -461,6 +462,24 @@ Module.register("calendar", {
 			}
 
 			return (temp + currentLine).trim();
+
+		} else if (wrapLines) {
+
+                       var temp = "";
+                       var currentLine = "";
+                         var lines = string.split("|");
+
+                         for (var i = 0; i < lines.length; i++) {
+                                 var line = lines[i];
+                                 if (line.length > maxLength) {
+                                         temp += line.slice(0, maxLength) + "&hellip;<br>";
+                                 } else {
+                                         temp += line + "<br>";
+                                 }
+                         }
+
+                         return temp.trim();
+
 		} else {
 			if (maxLength && typeof maxLength === "number" && string.length > maxLength) {
 				return string.trim().slice(0, maxLength) + "&hellip;";
@@ -501,7 +520,7 @@ Module.register("calendar", {
 			title = title.replace(needle, replacement);
 		}
 
-		title = this.shorten(title, this.config.maxTitleLength, this.config.wrapEvents);
+                title = this.shorten(title, this.config.maxTitleLength, this.config.wrapEvents, this.config.wrapLines);
 		return title;
 	},
 
